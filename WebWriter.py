@@ -3,29 +3,23 @@ Attempting to write a web-page in python. This involves writing Javascript, html
 
 """
 import os.path
+import re
 
 html_path = "html_test.html"
 
+# Functions
 
-class Foo:
-    def __init__(self):
-        """
 
-        """
-        self.file = None
-        self.file_dict = {}
+def get_file_exist(path):
+    """
+    Checks if the file at the given path exists.
+    :param path: string
+    :return: True/False
+    """
+    return os.path.isfile(path)
 
-    @staticmethod
-    def get_file_exist(path):
-        """
-        Checks if the file at the given path exists.
-        :param path: string
-        :return: True/False
-        """
-        return os.path.isfile(path)
 
-    @staticmethod
-    def get_file_type(path):
+def get_file_type(path):
         """
         Checks the file at the given path's type via string manipulation.
         :param path: string
@@ -33,14 +27,22 @@ class Foo:
         """
         return path[path.find(".")+1:]
 
-    def create_file(self, path):
+
+class FileManager(object):
+    def __init__(self):
+        super().__init__()
+        self.file = None
+        self.file_dict = {}
+
+    @staticmethod
+    def create_file(path):
         """
         Creates a file at the given path.
         :param path: string
         :return:
         """
         print("Attempting to create a new file", path)
-        if self.get_file_exist(path):
+        if get_file_exist(path):
             print("File", path, "already exists.")
             return
         file = open(path, "w+")
@@ -53,7 +55,7 @@ class Foo:
         :return:
         """
         print("Attempting to open file", path)
-        if self.get_file_exist(path):
+        if get_file_exist(path):
             self.file = open(path, "w+")
             print("File", path, "is open")
         else:
@@ -99,8 +101,8 @@ class Foo:
     def smart_create_blank_html(self, path, name):
         print(" ----- SMART PROCESS BEGIN ----- ")
 
-        if self.get_file_type(path) == "html":
-            if self.get_file_exist(path):
+        if get_file_type(path) == "html":
+            if get_file_exist(path):
                 t = input("File " + str(path) + " already exists. Revert to basic template? (Y/N)").capitalize()
                 if t == "Y":
                     self.open_file(path)
@@ -118,10 +120,54 @@ class Foo:
                 self.close_file()
                 print("File " + str(path) + " created as a basic html template")
         else:
-            print(self.get_file_type(path))
+            print(get_file_type(path))
 
 
-Bar = Foo()
+class HtmlBrowser(object):
+    def __init__(self):
+        super().__init__()
 
-Bar.smart_create_blank_html(html_path, "Main")
-print("\n\n" + str(Bar.file_dict))
+    @staticmethod
+    def get_title(path, text_only=True):
+        with open(path, "r") as file:
+            data = file.read()
+        m = re.search("<title>.*</title>", data)
+        if m:
+            span = m.span()
+            if text_only:
+                print(data[span[0]+7:span[1]-8])
+            else:
+                print(data[span[0]:span[1]])
+
+
+class Scribe(object):
+    def __init__(self):
+        super().__init__()
+        self.file = None
+        self.pos = 0
+
+    def write_add(self, text):
+        with open(self.file, "r") as file:
+            data = file.read()
+        data = data[:self.pos] + text + data[self.pos:]
+        with open(self.file, "w+") as file:
+            file.write(data)
+
+
+class HtmlEditor(Scribe):
+    def __init__(self):
+        super().__init__()
+
+    def add_element(self, tag, *kwargs):
+        if tag is "title":
+            h_browser.get_title(self.file, text_only=False)
+
+
+# Workspace
+file_manager = FileManager()
+h_browser = HtmlBrowser()
+h_editor = HtmlEditor()
+
+h_editor.file = html_path
+h_editor.add_element("title")
+
