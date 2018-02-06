@@ -1,7 +1,7 @@
-import WebWriter as ww
+import PyWeb.WebWriter as ww
 
 # Do not run this file currently
-run = False
+run = True
 
 if run:
 
@@ -11,7 +11,7 @@ if run:
     Editor = ww.html_editor
 
     # Demonstration of function by creating a new html file
-    html_name = "BareBones.html"
+    html_name = "html_test.html"
 
     Files.smart_create_blank_html(html_name, "Main")
 
